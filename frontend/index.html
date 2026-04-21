@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bapoo MixPlay - 家庭水吧菜单游戏</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- 导航栏 -->
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="logo">
+                    <span class="logo-icon">🍹</span>
+                    <span class="logo-text">Bapoo MixPlay</span>
+                </div>
+                <div class="nav-menu">
+                    <button class="nav-btn active" data-page="menu">菜单</button>
+                    <button class="nav-btn" data-page="family">家人</button>
+                    <button class="nav-btn" data-page="history">记录</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 主内容区域 -->
+        <main class="main-content">
+            <!-- 菜单页面 -->
+            <div id="menu-page" class="page active">
+                <!-- 分类标签 -->
+                <div class="category-tabs">
+                    <button class="category-tab active" data-category="all">全部</button>
+                    <button class="category-tab" data-category="基础饮品">基础饮品</button>
+                    <button class="category-tab" data-category="奶茶系列">奶茶系列</button>
+                    <button class="category-tab" data-category="果茶系列">果茶系列</button>
+                    <button class="category-tab" data-category="咖啡系列">咖啡系列</button>
+                </div>
+
+                <!-- 解锁进度 -->
+                <div class="progress-bar-container">
+                    <div class="progress-info">
+                        <span class="progress-text">解锁进度</span>
+                        <span class="progress-count">已完成 0/15 单</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <div class="unlock-hint">
+                        <span>完成3单解锁奶茶系列 | 完成5单解锁果茶系列</span>
+                    </div>
+                </div>
+
+                <!-- 饮品列表 -->
+                <div class="drinks-grid" id="drinks-container">
+                    <!-- 饮品卡片将通过JavaScript动态加载 -->
+                </div>
+            </div>
+
+            <!-- 家人管理页面 -->
+            <div id="family-page" class="page">
+                <div class="page-header">
+                    <h2>家庭成员管理</h2>
+                    <p class="page-subtitle">添加家庭成员，系统将随机指派"冤种"来制作饮品</p>
+                </div>
+                
+                <div class="add-family-section">
+                    <button class="btn-primary" id="add-family-btn">
+                        <span>+</span> 添加家庭成员
+                    </button>
+                </div>
+
+                <div class="family-list" id="family-list">
+                    <!-- 家庭成员将通过JavaScript动态加载 -->
+                </div>
+
+                <!-- 添加家庭成员弹窗 -->
+                <div class="modal" id="add-family-modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>添加家庭成员</h3>
+                            <button class="modal-close" id="close-family-modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="member-name">昵称/称呼</label>
+                                <input type="text" id="member-name" placeholder="例如：老公、老婆、宝贝儿子">
+                            </div>
+                            <div class="form-group">
+                                <label for="member-role">角色</label>
+                                <select id="member-role">
+                                    <option value="爸爸">爸爸</option>
+                                    <option value="妈妈">妈妈</option>
+                                    <option value="儿子">儿子</option>
+                                    <option value="女儿">女儿</option>
+                                    <option value="爷爷">爷爷</option>
+                                    <option value="奶奶">奶奶</option>
+                                    <option value="其他">其他</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn-secondary" id="cancel-family-btn">取消</button>
+                            <button class="btn-primary" id="confirm-family-btn">确认添加</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 历史记录页面 -->
+            <div id="history-page" class="page">
+                <div class="page-header">
+                    <h2>点单记录</h2>
+                    <p class="page-subtitle">查看过往的点单历史和"冤种"统计</p>
+                </div>
+
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-info">
+                            <div class="stat-number">0</div>
+                            <div class="stat-label">总点单数</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">👑</div>
+                        <div class="stat-info">
+                            <div class="stat-number">-</div>
+                            <div class="stat-label">最冤种称号</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="history-list" id="history-list">
+                    <div class="empty-state">
+                        <div class="empty-icon">📝</div>
+                        <p>还没有点单记录</p>
+                        <p class="empty-hint">快去点一杯饮品开始你的"冤种"之旅吧！</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 饮品详情弹窗 -->
+        <div class="modal" id="drink-modal">
+            <div class="modal-content drink-modal">
+                <div class="modal-header">
+                    <h3 id="modal-drink-name">饮品名称</h3>
+                    <button class="modal-close" id="close-drink-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <!-- 饮品信息 -->
+                    <div class="drink-detail-info">
+                        <div class="drink-detail-icon" id="modal-drink-icon">🥤</div>
+                        <p class="drink-detail-desc" id="modal-drink-desc">饮品描述</p>
+                        <div class="drink-detail-price">
+                            <span class="price-label">基础价格：</span>
+                            <span class="price-value" id="modal-drink-price">¥0</span>
+                        </div>
+                    </div>
+
+                    <!-- 定制选项 -->
+                    <div class="customization-section">
+                        <h4>定制选项</h4>
+                        
+                        <!-- 甜度 -->
+                        <div class="customization-group">
+                            <label class="customization-label">甜度</label>
+                            <div class="customization-options" id="sweetness-options">
+                                <button class="custom-option active" data-value="半糖">半糖</button>
+                                <button class="custom-option" data-value="全糖">全糖</button>
+                                <button class="custom-option" data-value="七分糖">七分糖</button>
+                                <button class="custom-option" data-value="三分糖">三分糖</button>
+                                <button class="custom-option" data-value="无糖">无糖</button>
+                            </div>
+                        </div>
+
+                        <!-- 冰量 -->
+                        <div class="customization-group">
+                            <label class="customization-label">冰量</label>
+                            <div class="customization-options" id="ice-options">
+                                <button class="custom-option active" data-value="少冰">少冰</button>
+                                <button class="custom-option" data-value="正常冰">正常冰</button>
+                                <button class="custom-option" data-value="去冰">去冰</button>
+                                <button class="custom-option" data-value="热饮">热饮</button>
+                                <button class="custom-option" data-value="常温">常温</button>
+                            </div>
+                        </div>
+
+                        <!-- 杯型 -->
+                        <div class="customization-group">
+                            <label class="customization-label">杯型</label>
+                            <div class="customization-options" id="cup-options">
+                                <button class="custom-option active" data-value="中杯">中杯</button>
+                                <button class="custom-option" data-value="大杯">大杯 +¥2</button>
+                                <button class="custom-option" data-value="超大杯">超大杯 +¥4</button>
+                            </div>
+                        </div>
+
+                        <!-- 加料 -->
+                        <div class="customization-group">
+                            <label class="customization-label">加料</label>
+                            <div class="customization-options toppings-options" id="toppings-options">
+                                <button class="custom-option" data-value="珍珠" data-price="2">珍珠 +¥2</button>
+                                <button class="custom-option" data-value="椰果" data-price="2">椰果 +¥2</button>
+                                <button class="custom-option" data-value="芋圆" data-price="3">芋圆 +¥3</button>
+                                <button class="custom-option" data-value="红豆" data-price="2">红豆 +¥2</button>
+                                <button class="custom-option" data-value="烧仙草" data-price="3">烧仙草 +¥3</button>
+                                <button class="custom-option" data-value="布丁" data-price="3">布丁 +¥3</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 价格汇总 -->
+                    <div class="price-summary">
+                        <span class="summary-label">总价：</span>
+                        <span class="summary-value" id="total-price">¥0</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" id="cancel-drink-btn">取消</button>
+                    <button class="btn-primary btn-order" id="confirm-order-btn">
+                        <span class="order-icon">🧋</span>
+                        立即下单
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 小票展示弹窗 -->
+        <div class="modal receipt-modal" id="receipt-modal">
+            <div class="modal-content receipt-content">
+                <div class="receipt-container" id="receipt-container">
+                    <!-- 小票内容将通过JavaScript生成 -->
+                </div>
+                <div class="receipt-actions">
+                    <button class="btn-secondary" id="close-receipt-btn">关闭</button>
+                    <button class="btn-primary" id="save-receipt-btn">
+                        <span>📸</span> 截图保存
+                    </button>
+                    <button class="btn-primary btn-share" id="share-receipt-btn">
+                        <span>💬</span> 分享到家庭群
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 解锁提示弹窗 -->
+        <div class="modal unlock-modal" id="unlock-modal">
+            <div class="modal-content unlock-content">
+                <div class="unlock-icon">🎉</div>
+                <h3 class="unlock-title">恭喜解锁新系列！</h3>
+                <p class="unlock-message" id="unlock-message">你已解锁奶茶系列！</p>
+                <button class="btn-primary" id="close-unlock-btn">太棒了！</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
