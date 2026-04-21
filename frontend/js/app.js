@@ -19,8 +19,7 @@ class MixPlayApp {
     async init() {
         this.loadFromLocalStorage();
         this.bindEvents();
-        await this.loadInitialData();
-        this.renderDrinks();
+        await this.renderDrinks();
         this.updateProgressBar();
     }
 
@@ -113,7 +112,19 @@ class MixPlayApp {
             document.getElementById('unlock-modal').classList.remove('active');
         });
 
+        this.bindModalCloseOnBackground();
         this.bindCustomizationEvents();
+    }
+
+    bindModalCloseOnBackground() {
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
     }
 
     bindCustomizationEvents() {
@@ -183,15 +194,6 @@ class MixPlayApp {
         document.getElementById('total-price').textContent = `¥${total.toFixed(1)}`;
     }
 
-    async loadInitialData() {
-        try {
-            this.familyMembers = await API.getFamilyMembers();
-            this.progress = await API.getProgress();
-        } catch (error) {
-            console.log('Using local data');
-        }
-    }
-
     switchPage(page) {
         this.currentPage = page;
 
@@ -229,7 +231,7 @@ class MixPlayApp {
 
     async renderDrinks() {
         const container = document.getElementById('drinks-container');
-        let drinks = await API.getDrinks();
+        let drinks = window.API.getMockDrinks();
 
         if (this.currentCategory !== 'all') {
             drinks = drinks.filter(d => d.category === this.currentCategory);
@@ -293,7 +295,7 @@ class MixPlayApp {
     }
 
     async openDrinkModal(drinkId) {
-        const drinks = await API.getDrinks();
+        const drinks = window.API.getMockDrinks();
         this.selectedDrink = drinks.find(d => d.id === drinkId);
         
         if (!this.selectedDrink) return;
@@ -378,7 +380,7 @@ class MixPlayApp {
             assigned_to: assignedMember.name
         };
 
-        const order = API.generateMockOrder(orderData);
+        const order = window.API.generateMockOrder(orderData);
         this.orderHistory.unshift(order);
 
         this.progress.total_orders++;
@@ -419,6 +421,7 @@ class MixPlayApp {
         }
 
         this.updateProgressBar();
+        this.renderDrinks();
     }
 
     updateProgressBar() {
@@ -536,9 +539,36 @@ class MixPlayApp {
                         <div class="assignment-count">被指派次数</div>
                         <div class="assignment-badge">${member.assignment_count} 次</div>
                     </div>
+                    <button class="delete-family-btn" data-id="${member.id}" title="删除">
+                        🗑️
+                    </button>
                 </div>
             `;
         }).join('');
+
+        container.querySelectorAll('.delete-family-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const memberId = parseInt(btn.dataset.id);
+                this.deleteFamilyMember(memberId);
+            });
+        });
+    }
+
+    deleteFamilyMember(memberId) {
+        if (this.familyMembers.length <= 1) {
+            alert('至少需要保留一个家庭成员！');
+            return;
+        }
+
+        if (confirm('确定要删除这个家庭成员吗？')) {
+            const index = this.familyMembers.findIndex(m => m.id === memberId);
+            if (index > -1) {
+                this.familyMembers.splice(index, 1);
+                this.saveToLocalStorage();
+                this.renderFamilyMembers();
+            }
+        }
     }
 
     addFamilyMember() {
@@ -642,11 +672,13 @@ class MixPlayApp {
                         </div>
                     </div>
                     <div class="history-assignment">
-                        <div>
+                        <div class="assignment-info">
                             <div class="assigned-to">系统指派</div>
                             <div class="assigned-name">${order.assigned_to}</div>
                         </div>
-                        <div class="fun-message">${order.fun_message}</div>
+                        <div class="fun-message-wrapper">
+                            <div class="fun-message">${order.fun_message}</div>
+                        </div>
                     </div>
                 </div>
             `;
