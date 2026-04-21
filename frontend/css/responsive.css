@@ -1,0 +1,420 @@
+@media (max-width: 480px) {
+    #app {
+        max-width: 100%;
+    }
+
+    .navbar {
+        padding: 12px 16px;
+    }
+
+    .nav-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .logo-text {
+        font-size: 18px;
+    }
+
+    .nav-menu {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .nav-btn {
+        flex: 1;
+        text-align: center;
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+
+    .main-content {
+        padding: 16px;
+        padding-bottom: 80px;
+    }
+
+    .drinks-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .drink-icon-wrapper {
+        height: 100px;
+    }
+
+    .drink-icon {
+        font-size: 52px;
+    }
+
+    .drink-info {
+        padding: 10px;
+    }
+
+    .drink-name {
+        font-size: 14px;
+    }
+
+    .drink-desc {
+        font-size: 11px;
+        -webkit-line-clamp: 1;
+    }
+
+    .drink-price {
+        font-size: 16px;
+    }
+
+    .order-btn-small {
+        padding: 5px 12px;
+        font-size: 11px;
+    }
+
+    .category-tabs {
+        gap: 6px;
+        margin-bottom: 16px;
+    }
+
+    .category-tab {
+        padding: 8px 14px;
+        font-size: 13px;
+    }
+
+    .progress-bar-container {
+        padding: 12px;
+        margin-bottom: 16px;
+    }
+
+    .stats-cards {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .stat-card {
+        padding: 16px;
+    }
+
+    .stat-number {
+        font-size: 24px;
+    }
+
+    .family-card {
+        padding: 12px;
+        gap: 12px;
+    }
+
+    .family-avatar {
+        width: 48px;
+        height: 48px;
+        font-size: 24px;
+    }
+
+    .family-name {
+        font-size: 14px;
+    }
+
+    .modal-content {
+        border-radius: var(--radius-lg);
+        max-height: 85vh;
+    }
+
+    .modal-header {
+        padding: 16px 16px 12px;
+    }
+
+    .modal-header h3 {
+        font-size: 16px;
+    }
+
+    .modal-body {
+        padding: 16px;
+    }
+
+    .modal-footer {
+        padding: 12px 16px 16px;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .modal-footer .btn-primary,
+    .modal-footer .btn-secondary {
+        width: 100%;
+        padding: 12px;
+    }
+
+    .custom-option {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+
+    .drink-detail-icon {
+        font-size: 56px;
+    }
+
+    .receipt-container {
+        padding: 16px;
+    }
+
+    .receipt-title {
+        font-size: 16px;
+    }
+
+    .assignment-name {
+        font-size: 18px;
+    }
+
+    .receipt-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .receipt-actions .btn-primary,
+    .receipt-actions .btn-secondary {
+        width: 100%;
+    }
+
+    .unlock-content {
+        padding: 30px 20px;
+    }
+
+    .unlock-icon {
+        font-size: 56px;
+    }
+
+    .unlock-title {
+        font-size: 20px;
+    }
+
+    .empty-state {
+        padding: 40px 16px;
+    }
+
+    .empty-icon {
+        font-size: 48px;
+    }
+
+    .page-header h2 {
+        font-size: 20px;
+    }
+
+    .page-subtitle {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 360px) {
+    .drinks-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .drink-card {
+        display: flex;
+        gap: 12px;
+    }
+
+    .drink-icon-wrapper {
+        width: 100px;
+        height: auto;
+        flex-shrink: 0;
+    }
+
+    .drink-info {
+        flex: 1;
+        padding: 12px 12px 12px 0;
+    }
+
+    .category-tabs {
+        padding-bottom: 6px;
+    }
+
+    .category-tab {
+        padding: 7px 12px;
+        font-size: 12px;
+    }
+
+    .nav-btn {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    .logo-icon {
+        font-size: 24px;
+    }
+
+    .logo-text {
+        font-size: 16px;
+    }
+
+    .customization-options {
+        gap: 6px;
+    }
+
+    .custom-option {
+        padding: 7px 10px;
+        font-size: 12px;
+    }
+
+    .receipt-row {
+        font-size: 12px;
+    }
+
+    .receipt-item-name {
+        font-size: 14px;
+    }
+
+    .receipt-item-specs {
+        font-size: 11px;
+    }
+}
+
+@media (min-width: 768px) {
+    #app {
+        max-width: 640px;
+        border-left: 1px solid var(--border-color);
+        border-right: 1px solid var(--border-color);
+    }
+
+    .drinks-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+
+    .stats-cards {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .main-content {
+        padding: 24px;
+    }
+}
+
+@media (min-width: 1024px) {
+    body {
+        display: flex;
+        justify-content: center;
+        background: linear-gradient(135deg, #FFF5F5 0%, #FFE8E8 50%, #FFF0E6 100%);
+    }
+
+    #app {
+        box-shadow: var(--shadow-lg);
+        margin: 20px 0;
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+    }
+
+    .navbar {
+        border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #1A1A2E;
+        --card-bg: #16213E;
+        --text-primary: #EAEAEA;
+        --text-secondary: #A0A0A0;
+        --text-light: #6B6B6B;
+        --border-color: #2D3748;
+    }
+
+    .drink-icon-wrapper {
+        background: linear-gradient(135deg, #1A1A2E 0%, #16213E 100%);
+    }
+
+    .progress-bar-container {
+        background: var(--card-bg);
+    }
+
+    .receipt-container {
+        background: #2D2D44;
+    }
+
+    .receipt-title,
+    .receipt-item-name {
+        color: #FFD700;
+    }
+
+    .receipt-row,
+    .receipt-label {
+        color: #CCCCCC;
+    }
+
+    .receipt-item-specs {
+        color: #999999;
+    }
+
+    .receipt-assignment {
+        background: linear-gradient(135deg, #4A3F5C 0%, #3D3251 100%);
+    }
+
+    .assignment-name {
+        color: #FFD700;
+    }
+
+    .assignment-message {
+        color: #FFB347;
+    }
+
+    .price-summary {
+        background: linear-gradient(135deg, #1A1A2E 0%, #16213E 100%);
+    }
+
+    .custom-option {
+        background: var(--card-bg);
+    }
+
+    .family-card,
+    .stat-card,
+    .history-card {
+        background: var(--card-bg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .drink-icon,
+    .logo-icon,
+    .unlock-icon {
+        animation: none !important;
+    }
+}
+
+@media print {
+    .navbar,
+    .nav-menu,
+    .category-tabs,
+    .progress-bar-container,
+    .receipt-actions,
+    .btn-primary,
+    .btn-secondary,
+    .modal-close {
+        display: none !important;
+    }
+
+    .receipt-container {
+        box-shadow: none;
+        border: 1px solid #D4A574;
+    }
+
+    #app {
+        max-width: 100%;
+        box-shadow: none;
+    }
+
+    .modal {
+        position: static;
+        background: white;
+    }
+
+    .modal-content {
+        max-width: 100%;
+        box-shadow: none;
+    }
+}
