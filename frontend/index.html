@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bapoo MixPlay - 家庭水吧</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 导航栏 -->
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="logo">
+                    <span class="logo-icon">🍹</span>
+                    <span class="logo-text">Bapoo MixPlay</span>
+                </div>
+                <div class="nav-menu">
+                    <button class="nav-btn active" data-page="menu">菜单</button>
+                    <button class="nav-btn" data-page="challenge">挑战</button>
+                    <button class="nav-btn" data-page="tasks">任务</button>
+                    <button class="nav-btn" data-page="achievements">成就</button>
+                    <button class="nav-btn" data-page="family">家人</button>
+                    <button class="nav-btn" data-page="history">历史</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 主内容区域 -->
+        <main class="main-content">
+            <!-- 菜单页面 -->
+            <div class="page active" id="menu-page">
+                <div class="page-header">
+                    <h2>家庭水吧</h2>
+                    <p class="page-subtitle">选择一杯饮品，开始你的"冤种"之旅</p>
+                </div>
+
+                <!-- 解锁进度 -->
+                <div class="progress-bar-container">
+                    <div class="progress-info">
+                        <span class="progress-text">解锁进度</span>
+                        <span class="progress-count">已完成 0/15 单</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <p class="unlock-hint">完成更多订单解锁新饮品系列</p>
+                </div>
+
+                <!-- 分类标签 -->
+                <div class="category-tabs">
+                    <button class="category-tab active" data-category="all">全部</button>
+                    <button class="category-tab" data-category="基础饮品">基础饮品</button>
+                    <button class="category-tab" data-category="奶茶系列">奶茶系列</button>
+                    <button class="category-tab" data-category="果茶系列">果茶系列</button>
+                    <button class="category-tab" data-category="咖啡系列">咖啡系列</button>
+                </div>
+
+                <!-- 饮品网格 -->
+                <div class="drinks-grid" id="drinks-container">
+                    <!-- 饮品卡片将通过 JavaScript 动态生成 -->
+                </div>
+            </div>
+
+            <!-- 挑战页面 -->
+            <div class="page" id="challenge-page">
+                <div class="page-header">
+                    <h2>挑战日</h2>
+                    <p class="page-subtitle">参与主题挑战，解锁专属成就</p>
+                </div>
+
+                <!-- 当前挑战 -->
+                <div class="current-challenge-section" id="current-challenge-section">
+                    <div class="challenge-card active" id="current-challenge-card">
+                        <div class="challenge-header">
+                            <span class="challenge-theme-icon">🎯</span>
+                            <div class="challenge-theme-info">
+                                <span class="challenge-theme-name">今日挑战</span>
+                                <span class="challenge-theme-desc" id="current-challenge-desc">暂无进行中的挑战</span>
+                            </div>
+                            <div class="challenge-status active" id="current-challenge-status">
+                                进行中
+                            </div>
+                        </div>
+                        <div class="challenge-progress">
+                            <div class="challenge-progress-info">
+                                <span class="challenge-progress-text">挑战进度</span>
+                                <span class="challenge-progress-count" id="current-challenge-progress">0/0</span>
+                            </div>
+                            <div class="challenge-progress-bar">
+                                <div class="challenge-progress-fill" id="current-challenge-fill" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="challenge-rewards">
+                            <span class="challenge-rewards-label">🎁 挑战奖励</span>
+                            <span class="challenge-rewards-content" id="current-challenge-rewards">暂无</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 可选择的挑战主题 -->
+                <div class="available-challenges-section">
+                    <h3 class="section-title">选择挑战主题</h3>
+                    <div class="challenge-themes-grid" id="challenge-themes-grid">
+                        <!-- 挑战主题将通过 JavaScript 动态生成 -->
+                    </div>
+                </div>
+
+                <!-- 挑战历史 -->
+                <div class="challenge-history-section">
+                    <h3 class="section-title">挑战历史</h3>
+                    <div class="challenge-history-list" id="challenge-history-list">
+                        <!-- 挑战历史将通过 JavaScript 动态生成 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 任务页面 -->
+            <div class="page" id="tasks-page">
+                <div class="page-header">
+                    <h2>协作任务链</h2>
+                    <p class="page-subtitle">全家协作，接力完成订单</p>
+                </div>
+
+                <!-- 任务统计 -->
+                <div class="task-stats-cards">
+                    <div class="task-stat-card">
+                        <div class="task-stat-icon">🔗</div>
+                        <div class="task-stat-info">
+                            <span class="task-stat-number" id="total-collaborations">0</span>
+                            <span class="task-stat-label">协作完成订单</span>
+                        </div>
+                    </div>
+                    <div class="task-stat-card">
+                        <div class="task-stat-icon">⚡</div>
+                        <div class="task-stat-info">
+                            <span class="task-stat-number" id="fastest-relay">--:--</span>
+                            <span class="task-stat-label">最快接力耗时</span>
+                        </div>
+                    </div>
+                    <div class="task-stat-card">
+                        <div class="task-stat-icon">📊</div>
+                        <div class="task-stat-info">
+                            <span class="task-stat-number" id="collaboration-rate">0%</span>
+                            <span class="task-stat-label">协作完成率</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 当前进行中的任务链 -->
+                <div class="active-tasks-section" id="active-tasks-section">
+                    <h3 class="section-title">进行中的任务链</h3>
+                    <div class="active-tasks-list" id="active-tasks-list">
+                        <!-- 进行中的任务链将通过 JavaScript 动态生成 -->
+                    </div>
+                </div>
+
+                <!-- 任务链历史 -->
+                <div class="task-history-section">
+                    <h3 class="section-title">任务链历史</h3>
+                    <div class="task-history-list" id="task-history-list">
+                        <!-- 任务链历史将通过 JavaScript 动态生成 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 成就页面 -->
+            <div class="page" id="achievements-page">
+                <div class="page-header">
+                    <h2>家庭成就</h2>
+                    <p class="page-subtitle">记录全家的荣耀时刻</p>
+                </div>
+
+                <!-- 家庭统计概览 -->
+                <div class="family-stats-overview">
+                    <h3 class="section-title">家庭统计</h3>
+                    <div class="achievement-stats-cards">
+                        <div class="achievement-stat-card">
+                            <div class="achievement-stat-icon">📝</div>
+                            <div class="achievement-stat-info">
+                                <span class="achievement-stat-number" id="family-total-orders">0</span>
+                                <span class="achievement-stat-label">累计点单</span>
+                            </div>
+                        </div>
+                        <div class="achievement-stat-card">
+                            <div class="achievement-stat-icon">🎯</div>
+                            <div class="achievement-stat-info">
+                                <span class="achievement-stat-number" id="family-unlocked-categories">1</span>
+                                <span class="achievement-stat-label">解锁品类</span>
+                            </div>
+                        </div>
+                        <div class="achievement-stat-card">
+                            <div class="achievement-stat-icon">🏆</div>
+                            <div class="achievement-stat-info">
+                                <span class="achievement-stat-number" id="family-achievements">0</span>
+                                <span class="achievement-stat-label">获得成就</span>
+                            </div>
+                        </div>
+                        <div class="achievement-stat-card">
+                            <div class="achievement-stat-icon">🔥</div>
+                            <div class="achievement-stat-info">
+                                <span class="achievement-stat-number" id="family-streak">0</span>
+                                <span class="achievement-stat-label">连续天数</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 家庭成就列表 -->
+                <div class="family-achievements-section">
+                    <h3 class="section-title">家庭成就墙</h3>
+                    <div class="achievements-grid" id="family-achievements-grid">
+                        <!-- 家庭成就将通过 JavaScript 动态生成 -->
+                    </div>
+                </div>
+
+                <!-- 个人贡献排行榜 -->
+                <div class="personal-contribution-section">
+                    <h3 class="section-title">个人贡献榜</h3>
+                    <div class="contribution-ranking" id="contribution-ranking">
+                        <!-- 个人贡献将通过 JavaScript 动态生成 -->
+                    </div>
+                </div>
+
+                <!-- 生成成就小票按钮 -->
+                <div class="generate-receipt-section">
+                    <button class="btn-primary" id="generate-achievement-receipt-btn">
+                        📄 生成家庭成就小票
+                    </button>
+                </div>
+            </div>
+
+            <!-- 家人页面 -->
+            <div class="page" id="family-page">
+                <div class="page-header">
+                    <h2>家庭成员</h2>
+                    <p class="page-subtitle">管理你的"冤种"团队</p>
+                </div>
+
+                <div class="add-family-section">
+                    <button class="btn-primary" id="add-family-btn">
+                        ➕ 添加家庭成员
+                    </button>
+                </div>
+
+                <div class="family-list" id="family-list">
+                    <!-- 家人卡片将通过 JavaScript 动态生成 -->
+                </div>
+            </div>
+
+            <!-- 历史页面 -->
+            <div class="page" id="history-page">
+                <div class="page-header">
+                    <h2>订单历史</h2>
+                    <p class="page-subtitle">查看过去的"冤种"时刻</p>
+                </div>
+
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <div class="stat-icon">📝</div>
+                        <div class="stat-info">
+                            <span class="stat-number">0</span>
+                            <span class="stat-label">总订单数</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-info">
+                            <span class="stat-number">--</span>
+                            <span class="stat-label">最冤种</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="history-list" id="history-list">
+                    <!-- 历史记录将通过 JavaScript 动态生成 -->
+                </div>
+            </div>
+        </main>
+
+        <!-- 模态框：添加家庭成员 -->
+        <div class="modal" id="add-family-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>添加家庭成员</h3>
+                    <button class="modal-close" id="close-family-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="member-name">称呼</label>
+                        <input type="text" id="member-name" placeholder="例如：老公大大">
+                    </div>
+                    <div class="form-group">
+                        <label for="member-role">角色</label>
+                        <select id="member-role">
+                            <option value="爸爸">爸爸</option>
+                            <option value="妈妈">妈妈</option>
+                            <option value="儿子">儿子</option>
+                            <option value="女儿">女儿</option>
+                            <option value="爷爷">爷爷</option>
+                            <option value="奶奶">奶奶</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" id="cancel-family-btn">取消</button>
+                    <button class="btn-primary" id="confirm-family-btn">确认添加</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 模态框：饮品详情 -->
+        <div class="modal drink-modal" id="drink-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modal-drink-name">饮品名称</h3>
+                    <button class="modal-close" id="close-drink-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="drink-detail-info">
+                        <div class="drink-detail-icon" id="modal-drink-icon">🥤</div>
+                        <p class="drink-detail-desc" id="modal-drink-desc">饮品描述</p>
+                        <p class="drink-detail-price">
+                            基础价格：<span class="price-value" id="modal-drink-price">¥0.0</span>
+                        </p>
+                    </div>
+
+                    <div class="customization-section">
+                        <div class="customization-group">
+                            <label class="customization-label">甜度</label>
+                            <div class="customization-options" id="sweetness-options">
+                                <button class="custom-option" data-value="全糖">全糖</button>
+                                <button class="custom-option active" data-value="半糖">半糖</button>
+                                <button class="custom-option" data-value="三分糖">三分糖</button>
+                                <button class="custom-option" data-value="无糖">无糖</button>
+                            </div>
+                        </div>
+
+                        <div class="customization-group">
+                            <label class="customization-label">冰量</label>
+                            <div class="customization-options" id="ice-options">
+                                <button class="custom-option" data-value="正常冰">正常冰</button>
+                                <button class="custom-option active" data-value="少冰">少冰</button>
+                                <button class="custom-option" data-value="去冰">去冰</button>
+                                <button class="custom-option" data-value="热饮">热饮</button>
+                            </div>
+                        </div>
+
+                        <div class="customization-group">
+                            <label class="customization-label">杯型</label>
+                            <div class="customization-options" id="cup-options">
+                                <button class="custom-option active" data-value="中杯">中杯</button>
+                                <button class="custom-option" data-value="大杯">大杯 +¥2</button>
+                                <button class="custom-option" data-value="超大杯">超大杯 +¥4</button>
+                            </div>
+                        </div>
+
+                        <div class="customization-group toppings-options">
+                            <label class="customization-label">加料（可多选）</label>
+                            <div class="customization-options" id="toppings-options">
+                                <button class="custom-option" data-value="珍珠" data-price="2">珍珠 +¥2</button>
+                                <button class="custom-option" data-value="椰果" data-price="2">椰果 +¥2</button>
+                                <button class="custom-option" data-value="芋圆" data-price="3">芋圆 +¥3</button>
+                                <button class="custom-option" data-value="红豆" data-price="2">红豆 +¥2</button>
+                                <button class="custom-option" data-value="烧仙草" data-price="3">烧仙草 +¥3</button>
+                                <button class="custom-option" data-value="布丁" data-price="3">布丁 +¥3</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="price-summary">
+                        <span class="summary-label">合计</span>
+                        <span class="summary-value" id="total-price">¥0.0</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" id="cancel-drink-btn">取消</button>
+                    <button class="btn-primary btn-order" id="confirm-order-btn">
+                        <span class="order-icon">🎯</span> 立即点单
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 模态框：小票 -->
+        <div class="modal receipt-modal" id="receipt-modal">
+            <div class="modal-content">
+                <div class="receipt-content">
+                    <div class="receipt-container" id="receipt-container">
+                        <!-- 小票内容将通过 JavaScript 动态生成 -->
+                    </div>
+                    <div class="receipt-actions">
+                        <button class="btn-secondary" id="close-receipt-btn">关闭</button>
+                        <button class="btn-primary" id="save-receipt-btn">📷 保存小票</button>
+                        <button class="btn-primary btn-share" id="share-receipt-btn">📤 分享</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 模态框：解锁提示 -->
+        <div class="modal unlock-modal" id="unlock-modal">
+            <div class="modal-content">
+                <div class="unlock-content">
+                    <div class="unlock-icon">🎉</div>
+                    <h3 class="unlock-title">恭喜解锁！</h3>
+                    <p class="unlock-message" id="unlock-message">你已解锁新的饮品系列！</p>
+                    <button class="btn-primary" id="close-unlock-btn">太棒了！</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 模态框：挑战详情 -->
+        <div class="modal" id="challenge-detail-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="challenge-detail-title">挑战详情</h3>
+                    <button class="modal-close" id="close-challenge-detail-modal">&times;</button>
+                </div>
+                <div class="modal-body" id="challenge-detail-body">
+                    <!-- 挑战详情将通过 JavaScript 动态生成 -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" id="cancel-challenge-detail-btn">取消</button>
+                    <button class="btn-primary" id="start-challenge-btn">开始挑战</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 模态框：任务链详情 -->
+        <div class="modal" id="task-detail-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="task-detail-title">任务链详情</h3>
+                    <button class="modal-close" id="close-task-detail-modal">&times;</button>
+                </div>
+                <div class="modal-body" id="task-detail-body">
+                    <!-- 任务链详情将通过 JavaScript 动态生成 -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" id="close-task-detail-btn">关闭</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 模态框：成就详情 -->
+        <div class="modal" id="achievement-detail-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="achievement-detail-title">成就详情</h3>
+                    <button class="modal-close" id="close-achievement-detail-modal">&times;</button>
+                </div>
+                <div class="modal-body" id="achievement-detail-body">
+                    <!-- 成就详情将通过 JavaScript 动态生成 -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" id="close-achievement-detail-btn">关闭</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 模态框：成就小票 -->
+        <div class="modal receipt-modal" id="achievement-receipt-modal">
+            <div class="modal-content">
+                <div class="receipt-content">
+                    <div class="receipt-container" id="achievement-receipt-container">
+                        <!-- 成就小票内容将通过 JavaScript 动态生成 -->
+                    </div>
+                    <div class="receipt-actions">
+                        <button class="btn-secondary" id="close-achievement-receipt-btn">关闭</button>
+                        <button class="btn-primary" id="save-achievement-receipt-btn">📷 保存小票</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 模态框：创建协作订单 -->
+        <div class="modal" id="create-collaboration-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>创建协作订单</h3>
+                    <button class="modal-close" id="close-create-collaboration-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>选择饮品</label>
+                        <div class="drink-selector" id="collaboration-drink-selector">
+                            <!-- 饮品选择器将通过 JavaScript 动态生成 -->
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>任务分配方式</label>
+                        <div class="assignment-options">
+                            <label class="assignment-option">
+                                <input type="radio" name="assignment-type" value="auto" checked>
+                                <span>系统自动指派</span>
+                            </label>
+                            <label class="assignment-option">
+                                <input type="radio" name="assignment-type" value="manual">
+                                <span>手动选择成员</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group" id="manual-assignment-section" style="display: none;">
+                        <label>选择家庭成员</label>
+                        <div class="member-selector" id="collaboration-member-selector">
+                            <!-- 成员选择器将通过 JavaScript 动态生成 -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" id="cancel-create-collaboration-btn">取消</button>
+                    <button class="btn-primary" id="confirm-create-collaboration-btn">创建任务链</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

@@ -204,8 +204,262 @@ const API = {
             fun_message: funMessages[Math.floor(Math.random() * funMessages.length)],
             status: 'pending',
             created_at: now.toISOString(),
-            formatted_time: now.toLocaleString('zh-CN')
+            formatted_time: now.toLocaleString('zh-CN'),
+            is_collaboration: orderData.is_collaboration || false,
+            collaboration_id: orderData.collaboration_id || null
         };
+    },
+
+    getChallengeThemes() {
+        return [
+            {
+                id: 'milk_tea_day',
+                name: '奶茶狂欢日',
+                description: '当日所有点单必须是奶茶系列饮品',
+                icon: '🧋',
+                category: '奶茶系列',
+                difficulty: '简单',
+                target_orders: 3,
+                rewards: {
+                    achievement: '奶茶爱好者',
+                    title: '奶茶达人',
+                    description: '完成奶茶狂欢日挑战'
+                }
+            },
+            {
+                id: 'fruit_tea_day',
+                name: '果茶清新日',
+                description: '当日所有点单必须是果茶系列饮品',
+                icon: '🍉',
+                category: '果茶系列',
+                difficulty: '中等',
+                target_orders: 4,
+                rewards: {
+                    achievement: '果茶清新派',
+                    title: '果茶达人',
+                    description: '完成果茶清新日挑战'
+                }
+            },
+            {
+                id: 'coffee_day',
+                name: '咖啡时光日',
+                description: '当日所有点单必须是咖啡系列饮品',
+                icon: '☕',
+                category: '咖啡系列',
+                difficulty: '困难',
+                target_orders: 5,
+                rewards: {
+                    achievement: '咖啡品鉴师',
+                    title: '咖啡达人',
+                    description: '完成咖啡时光日挑战'
+                }
+            },
+            {
+                id: 'mixed_day',
+                name: '混合挑战日',
+                description: '当日需要点单不同系列的饮品',
+                icon: '🎨',
+                category: 'mixed',
+                difficulty: '专家',
+                target_orders: 6,
+                rewards: {
+                    achievement: '全能饮品师',
+                    title: '全能达人',
+                    description: '完成混合挑战日挑战'
+                }
+            }
+        ];
+    },
+
+    getTaskTypes() {
+        return [
+            {
+                id: 'prepare',
+                name: '备料',
+                description: '准备饮品所需的原材料',
+                icon: '🥣',
+                estimated_time: 5
+            },
+            {
+                id: 'make',
+                name: '调制',
+                description: '按照配方调制饮品',
+                icon: '🍹',
+                estimated_time: 8
+            },
+            {
+                id: 'decorate',
+                name: '装饰',
+                description: '为饮品添加装饰和点缀',
+                icon: '✨',
+                estimated_time: 3
+            },
+            {
+                id: 'serve',
+                name: '出品',
+                description: '将饮品送达点单者',
+                icon: '🍽️',
+                estimated_time: 2
+            }
+        ];
+    },
+
+    getAchievements() {
+        return [
+            {
+                id: 'first_order',
+                name: '初次体验',
+                description: '完成第一笔订单',
+                icon: '🎉',
+                category: 'order',
+                target: 1,
+                rarity: '普通'
+            },
+            {
+                id: 'order_10',
+                name: '小试牛刀',
+                description: '完成10笔订单',
+                icon: '📝',
+                category: 'order',
+                target: 10,
+                rarity: '稀有'
+            },
+            {
+                id: 'order_50',
+                name: '饮品大师',
+                description: '完成50笔订单',
+                icon: '🏆',
+                category: 'order',
+                target: 50,
+                rarity: '史诗'
+            },
+            {
+                id: 'order_100',
+                name: '水吧传奇',
+                description: '完成100笔订单',
+                icon: '👑',
+                category: 'order',
+                target: 100,
+                rarity: '传说'
+            },
+            {
+                id: 'unlock_milk_tea',
+                name: '奶茶初体验',
+                description: '解锁奶茶系列',
+                icon: '🧋',
+                category: 'unlock',
+                target: '奶茶系列',
+                rarity: '普通'
+            },
+            {
+                id: 'unlock_fruit_tea',
+                name: '果茶清新',
+                description: '解锁果茶系列',
+                icon: '🍉',
+                category: 'unlock',
+                target: '果茶系列',
+                rarity: '稀有'
+            },
+            {
+                id: 'unlock_coffee',
+                name: '咖啡时光',
+                description: '解锁咖啡系列',
+                icon: '☕',
+                category: 'unlock',
+                target: '咖啡系列',
+                rarity: '史诗'
+            },
+            {
+                id: 'unlock_all',
+                name: '全能解锁',
+                description: '解锁所有饮品系列',
+                icon: '🎯',
+                category: 'unlock',
+                target: 'all',
+                rarity: '传说'
+            },
+            {
+                id: 'challenge_milk_tea',
+                name: '奶茶爱好者',
+                description: '完成奶茶狂欢日挑战',
+                icon: '🧋',
+                category: 'challenge',
+                target: 'milk_tea_day',
+                rarity: '稀有'
+            },
+            {
+                id: 'challenge_fruit_tea',
+                name: '果茶清新派',
+                description: '完成果茶清新日挑战',
+                icon: '🍉',
+                category: 'challenge',
+                target: 'fruit_tea_day',
+                rarity: '稀有'
+            },
+            {
+                id: 'challenge_coffee',
+                name: '咖啡品鉴师',
+                description: '完成咖啡时光日挑战',
+                icon: '☕',
+                category: 'challenge',
+                target: 'coffee_day',
+                rarity: '史诗'
+            },
+            {
+                id: 'challenge_mixed',
+                name: '全能饮品师',
+                description: '完成混合挑战日挑战',
+                icon: '🎨',
+                category: 'challenge',
+                target: 'mixed_day',
+                rarity: '史诗'
+            },
+            {
+                id: 'collaboration_first',
+                name: '初次协作',
+                description: '完成第一次协作任务链',
+                icon: '🤝',
+                category: 'collaboration',
+                target: 1,
+                rarity: '普通'
+            },
+            {
+                id: 'collaboration_10',
+                name: '协作达人',
+                description: '完成10次协作任务链',
+                icon: '🔗',
+                category: 'collaboration',
+                target: 10,
+                rarity: '稀有'
+            },
+            {
+                id: 'collaboration_fast',
+                name: '闪电接力',
+                description: '在5分钟内完成一次协作任务链',
+                icon: '⚡',
+                category: 'collaboration',
+                target: 300,
+                rarity: '史诗'
+            },
+            {
+                id: 'streak_7',
+                name: '周周坚持',
+                description: '连续7天有点单记录',
+                icon: '🔥',
+                category: 'streak',
+                target: 7,
+                rarity: '稀有'
+            },
+            {
+                id: 'streak_30',
+                name: '月度达人',
+                description: '连续30天有点单记录',
+                icon: '🌟',
+                category: 'streak',
+                target: 30,
+                rarity: '史诗'
+            }
+        ];
     }
 };
 

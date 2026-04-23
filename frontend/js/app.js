@@ -13,6 +13,21 @@ class MixPlayApp {
         this.progress = null;
         this.orderHistory = [];
         
+        this.currentChallenge = null;
+        this.challengeHistory = [];
+        this.activeTaskChains = [];
+        this.taskChainHistory = [];
+        this.earnedAchievements = [];
+        this.personalContributions = {};
+        this.fastestRelayTime = null;
+        this.streakDays = 0;
+        this.lastOrderDate = null;
+        
+        this.selectedChallengeTheme = null;
+        this.selectedCollaborationDrink = null;
+        this.assignmentType = 'auto';
+        this.selectedCollaborationMembers = [];
+        
         this.init();
     }
 
@@ -21,6 +36,10 @@ class MixPlayApp {
         this.bindEvents();
         await this.renderDrinks();
         this.updateProgressBar();
+        this.renderChallengeThemes();
+        this.renderTaskStats();
+        this.renderAchievements();
+        this.renderContributionRanking();
     }
 
     loadFromLocalStorage() {
@@ -51,12 +70,79 @@ class MixPlayApp {
         if (savedHistory) {
             this.orderHistory = JSON.parse(savedHistory);
         }
+
+        const savedCurrentChallenge = localStorage.getItem('mixplay_current_challenge');
+        if (savedCurrentChallenge) {
+            this.currentChallenge = JSON.parse(savedCurrentChallenge);
+        }
+
+        const savedChallengeHistory = localStorage.getItem('mixplay_challenge_history');
+        if (savedChallengeHistory) {
+            this.challengeHistory = JSON.parse(savedChallengeHistory);
+        }
+
+        const savedActiveTaskChains = localStorage.getItem('mixplay_active_task_chains');
+        if (savedActiveTaskChains) {
+            this.activeTaskChains = JSON.parse(savedActiveTaskChains);
+        }
+
+        const savedTaskChainHistory = localStorage.getItem('mixplay_task_chain_history');
+        if (savedTaskChainHistory) {
+            this.taskChainHistory = JSON.parse(savedTaskChainHistory);
+        }
+
+        const savedEarnedAchievements = localStorage.getItem('mixplay_earned_achievements');
+        if (savedEarnedAchievements) {
+            this.earnedAchievements = JSON.parse(savedEarnedAchievements);
+        }
+
+        const savedPersonalContributions = localStorage.getItem('mixplay_personal_contributions');
+        if (savedPersonalContributions) {
+            this.personalContributions = JSON.parse(savedPersonalContributions);
+        }
+
+        const savedFastestRelayTime = localStorage.getItem('mixplay_fastest_relay_time');
+        if (savedFastestRelayTime) {
+            this.fastestRelayTime = parseInt(savedFastestRelayTime);
+        }
+
+        const savedStreakDays = localStorage.getItem('mixplay_streak_days');
+        if (savedStreakDays) {
+            this.streakDays = parseInt(savedStreakDays);
+        }
+
+        const savedLastOrderDate = localStorage.getItem('mixplay_last_order_date');
+        if (savedLastOrderDate) {
+            this.lastOrderDate = savedLastOrderDate;
+        }
     }
 
     saveToLocalStorage() {
         localStorage.setItem('mixplay_family', JSON.stringify(this.familyMembers));
         localStorage.setItem('mixplay_progress', JSON.stringify(this.progress));
         localStorage.setItem('mixplay_history', JSON.stringify(this.orderHistory));
+        
+        if (this.currentChallenge) {
+            localStorage.setItem('mixplay_current_challenge', JSON.stringify(this.currentChallenge));
+        } else {
+            localStorage.removeItem('mixplay_current_challenge');
+        }
+        
+        localStorage.setItem('mixplay_challenge_history', JSON.stringify(this.challengeHistory));
+        localStorage.setItem('mixplay_active_task_chains', JSON.stringify(this.activeTaskChains));
+        localStorage.setItem('mixplay_task_chain_history', JSON.stringify(this.taskChainHistory));
+        localStorage.setItem('mixplay_earned_achievements', JSON.stringify(this.earnedAchievements));
+        localStorage.setItem('mixplay_personal_contributions', JSON.stringify(this.personalContributions));
+        
+        if (this.fastestRelayTime !== null) {
+            localStorage.setItem('mixplay_fastest_relay_time', this.fastestRelayTime.toString());
+        }
+        
+        localStorage.setItem('mixplay_streak_days', this.streakDays.toString());
+        
+        if (this.lastOrderDate) {
+            localStorage.setItem('mixplay_last_order_date', this.lastOrderDate);
+        }
     }
 
     bindEvents() {
@@ -683,6 +769,1105 @@ class MixPlayApp {
                 </div>
             `;
         }).join('');
+    }
+
+    switchPage(page) {
+        this.currentPage = page;
+
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.page === page) {
+                btn.classList.add('active');
+            }
+        });
+
+        document.querySelectorAll('.page').forEach(p => {
+            p.classList.remove('active');
+        });
+        document.getElementById(`${page}-page`).classList.add('active');
+
+        if (page === 'family') {
+            this.renderFamilyMembers();
+        } else if (page === 'history') {
+            this.renderHistory();
+        } else if (page === 'challenge') {
+            this.renderChallengeThemes();
+            this.renderCurrentChallenge();
+            this.renderChallengeHistory();
+        } else if (page === 'tasks') {
+            this.renderTaskStats();
+            this.renderActiveTaskChains();
+            this.renderTaskChainHistory();
+        } else if (page === 'achievements') {
+            this.renderAchievements();
+            this.renderContributionRanking();
+            this.updateAchievementStats();
+        }
+    }
+
+    bindEvents() {
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => this.switchPage(e.target.dataset.page));
+        });
+
+        document.querySelectorAll('.category-tab').forEach(tab => {
+            tab.addEventListener('click', (e) => this.switchCategory(e.target.dataset.category));
+        });
+
+        document.getElementById('add-family-btn').addEventListener('click', () => {
+            document.getElementById('add-family-modal').classList.add('active');
+        });
+
+        document.getElementById('close-family-modal').addEventListener('click', () => {
+            document.getElementById('add-family-modal').classList.remove('active');
+        });
+
+        document.getElementById('cancel-family-btn').addEventListener('click', () => {
+            document.getElementById('add-family-modal').classList.remove('active');
+        });
+
+        document.getElementById('confirm-family-btn').addEventListener('click', () => {
+            this.addFamilyMember();
+        });
+
+        document.getElementById('close-drink-modal').addEventListener('click', () => {
+            document.getElementById('drink-modal').classList.remove('active');
+        });
+
+        document.getElementById('cancel-drink-btn').addEventListener('click', () => {
+            document.getElementById('drink-modal').classList.remove('active');
+        });
+
+        document.getElementById('confirm-order-btn').addEventListener('click', () => {
+            this.placeOrder();
+        });
+
+        document.getElementById('close-receipt-btn').addEventListener('click', () => {
+            document.getElementById('receipt-modal').classList.remove('active');
+        });
+
+        document.getElementById('save-receipt-btn').addEventListener('click', () => {
+            this.takeScreenshot();
+        });
+
+        document.getElementById('share-receipt-btn').addEventListener('click', () => {
+            this.shareReceipt();
+        });
+
+        document.getElementById('close-unlock-btn').addEventListener('click', () => {
+            document.getElementById('unlock-modal').classList.remove('active');
+        });
+
+        this.bindChallengeEvents();
+        this.bindTaskEvents();
+        this.bindAchievementEvents();
+        this.bindModalCloseOnBackground();
+        this.bindCustomizationEvents();
+    }
+
+    bindChallengeEvents() {
+        document.getElementById('close-challenge-detail-modal').addEventListener('click', () => {
+            document.getElementById('challenge-detail-modal').classList.remove('active');
+        });
+
+        document.getElementById('cancel-challenge-detail-btn').addEventListener('click', () => {
+            document.getElementById('challenge-detail-modal').classList.remove('active');
+        });
+
+        document.getElementById('start-challenge-btn').addEventListener('click', () => {
+            this.startChallenge();
+        });
+    }
+
+    bindTaskEvents() {
+        document.getElementById('close-task-detail-modal').addEventListener('click', () => {
+            document.getElementById('task-detail-modal').classList.remove('active');
+        });
+
+        document.getElementById('close-task-detail-btn').addEventListener('click', () => {
+            document.getElementById('task-detail-modal').classList.remove('active');
+        });
+
+        document.getElementById('close-create-collaboration-modal').addEventListener('click', () => {
+            document.getElementById('create-collaboration-modal').classList.remove('active');
+        });
+
+        document.getElementById('cancel-create-collaboration-btn').addEventListener('click', () => {
+            document.getElementById('create-collaboration-modal').classList.remove('active');
+        });
+
+        document.getElementById('confirm-create-collaboration-btn').addEventListener('click', () => {
+            this.createCollaborationOrder();
+        });
+
+        document.querySelectorAll('input[name="assignment-type"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                this.assignmentType = e.target.value;
+                const manualSection = document.getElementById('manual-assignment-section');
+                if (e.target.value === 'manual') {
+                    manualSection.style.display = 'block';
+                } else {
+                    manualSection.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    bindAchievementEvents() {
+        document.getElementById('close-achievement-detail-modal').addEventListener('click', () => {
+            document.getElementById('achievement-detail-modal').classList.remove('active');
+        });
+
+        document.getElementById('close-achievement-detail-btn').addEventListener('click', () => {
+            document.getElementById('achievement-detail-modal').classList.remove('active');
+        });
+
+        document.getElementById('generate-achievement-receipt-btn').addEventListener('click', () => {
+            this.generateAchievementReceipt();
+        });
+
+        document.getElementById('close-achievement-receipt-btn').addEventListener('click', () => {
+            document.getElementById('achievement-receipt-modal').classList.remove('active');
+        });
+
+        document.getElementById('save-achievement-receipt-btn').addEventListener('click', () => {
+            this.takeScreenshot();
+        });
+    }
+
+    renderChallengeThemes() {
+        const themes = window.API.getChallengeThemes();
+        const container = document.getElementById('challenge-themes-grid');
+        
+        const difficultyColors = {
+            '简单': 'var(--secondary-color)',
+            '中等': 'var(--accent-orange)',
+            '困难': 'var(--primary-color)',
+            '专家': 'var(--accent-purple)'
+        };
+
+        container.innerHTML = themes.map(theme => {
+            const isActive = this.currentChallenge && this.currentChallenge.theme_id === theme.id;
+            const isCompleted = this.challengeHistory.some(h => h.theme_id === theme.id && h.status === 'completed');
+            
+            return `
+                <div class="challenge-theme-card ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}" data-theme-id="${theme.id}">
+                    <div class="challenge-theme-header">
+                        <span class="challenge-theme-icon">${theme.icon}</span>
+                        <span class="challenge-theme-name">${theme.name}</span>
+                        <span class="challenge-difficulty-badge" style="background: ${difficultyColors[theme.difficulty]}">
+                            ${theme.difficulty}
+                        </span>
+                    </div>
+                    <p class="challenge-theme-desc">${theme.description}</p>
+                    <div class="challenge-theme-footer">
+                        <span class="challenge-target">目标: ${theme.target_orders} 单</span>
+                        <span class="challenge-reward">🎁 ${theme.rewards.achievement}</span>
+                    </div>
+                    ${isActive ? '<div class="active-indicator">进行中</div>' : ''}
+                    ${isCompleted ? '<div class="completed-indicator">✓ 已完成</div>' : ''}
+                </div>
+            `;
+        }).join('');
+
+        container.querySelectorAll('.challenge-theme-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const themeId = card.dataset.themeId;
+                this.openChallengeDetail(themeId);
+            });
+        });
+    }
+
+    renderCurrentChallenge() {
+        const section = document.getElementById('current-challenge-section');
+        const card = document.getElementById('current-challenge-card');
+        
+        if (!this.currentChallenge) {
+            section.style.display = 'none';
+            return;
+        }
+
+        section.style.display = 'block';
+        
+        const themes = window.API.getChallengeThemes();
+        const theme = themes.find(t => t.id === this.currentChallenge.theme_id);
+        
+        if (!theme) return;
+
+        document.getElementById('current-challenge-desc').textContent = theme.name;
+        document.getElementById('current-challenge-progress').textContent = 
+            `${this.currentChallenge.completed_orders}/${theme.target_orders}`;
+        
+        const progress = (this.currentChallenge.completed_orders / theme.target_orders) * 100;
+        document.getElementById('current-challenge-fill').style.width = `${progress}%`;
+        document.getElementById('current-challenge-rewards').textContent = 
+            `成就: ${theme.rewards.achievement} | 称号: ${theme.rewards.title}`;
+    }
+
+    renderChallengeHistory() {
+        const container = document.getElementById('challenge-history-list');
+        
+        if (this.challengeHistory.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">🎯</div>
+                    <p>还没有挑战记录</p>
+                    <p class="empty-hint">选择一个挑战主题开始你的挑战之旅吧！</p>
+                </div>
+            `;
+            return;
+        }
+
+        const themes = window.API.getChallengeThemes();
+        
+        container.innerHTML = this.challengeHistory.slice(0, 10).map(history => {
+            const theme = themes.find(t => t.id === history.theme_id);
+            const statusClass = history.status === 'completed' ? 'status-completed' : 'status-failed';
+            const statusText = history.status === 'completed' ? '✓ 完成' : '✗ 失败';
+            
+            return `
+                <div class="challenge-history-card">
+                    <div class="challenge-history-header">
+                        <span class="challenge-history-icon">${theme ? theme.icon : '🎯'}</span>
+                        <span class="challenge-history-name">${theme ? theme.name : '未知挑战'}</span>
+                        <span class="challenge-history-status ${statusClass}">${statusText}</span>
+                    </div>
+                    <div class="challenge-history-details">
+                        <span>完成: ${history.completed_orders}/${history.target_orders}</span>
+                        <span>开始: ${this.formatDate(history.started_at)}</span>
+                        ${history.completed_at ? `<span>完成: ${this.formatDate(history.completed_at)}</span>` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    openChallengeDetail(themeId) {
+        const themes = window.API.getChallengeThemes();
+        const theme = themes.find(t => t.id === themeId);
+        
+        if (!theme) return;
+
+        this.selectedChallengeTheme = theme;
+        
+        document.getElementById('challenge-detail-title').textContent = theme.name;
+        
+        const difficultyColors = {
+            '简单': 'var(--secondary-color)',
+            '中等': 'var(--accent-orange)',
+            '困难': 'var(--primary-color)',
+            '专家': 'var(--accent-purple)'
+        };
+
+        document.getElementById('challenge-detail-body').innerHTML = `
+            <div class="challenge-detail-info">
+                <div class="challenge-detail-icon">${theme.icon}</div>
+                <p class="challenge-detail-desc">${theme.description}</p>
+                
+                <div class="challenge-detail-stats">
+                    <div class="challenge-detail-stat">
+                        <span class="challenge-detail-stat-label">难度</span>
+                        <span class="challenge-detail-stat-value" style="color: ${difficultyColors[theme.difficulty]}">
+                            ${theme.difficulty}
+                        </span>
+                    </div>
+                    <div class="challenge-detail-stat">
+                        <span class="challenge-detail-stat-label">目标订单</span>
+                        <span class="challenge-detail-stat-value">${theme.target_orders} 单</span>
+                    </div>
+                    <div class="challenge-detail-stat">
+                        <span class="challenge-detail-stat-label">限制品类</span>
+                        <span class="challenge-detail-stat-value">${theme.category === 'mixed' ? '混合品类' : theme.category}</span>
+                    </div>
+                </div>
+                
+                <div class="challenge-rewards-section">
+                    <h4>🎁 挑战奖励</h4>
+                    <div class="challenge-reward-item">
+                        <span class="reward-icon">🏆</span>
+                        <span class="reward-text">成就: ${theme.rewards.achievement}</span>
+                    </div>
+                    <div class="challenge-reward-item">
+                        <span class="reward-icon">👑</span>
+                        <span class="reward-text">专属称号: ${theme.rewards.title}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const startBtn = document.getElementById('start-challenge-btn');
+        if (this.currentChallenge) {
+            if (this.currentChallenge.theme_id === themeId) {
+                startBtn.textContent = '挑战进行中';
+                startBtn.disabled = true;
+            } else {
+                startBtn.textContent = '开始新挑战';
+                startBtn.disabled = false;
+            }
+        } else {
+            startBtn.textContent = '开始挑战';
+            startBtn.disabled = false;
+        }
+
+        document.getElementById('challenge-detail-modal').classList.add('active');
+    }
+
+    startChallenge() {
+        if (!this.selectedChallengeTheme) return;
+
+        if (this.currentChallenge) {
+            if (!confirm('当前有进行中的挑战，开始新挑战将放弃当前挑战，确定继续吗？')) {
+                return;
+            }
+            this.challengeHistory.push({
+                ...this.currentChallenge,
+                status: 'failed',
+                ended_at: new Date().toISOString()
+            });
+        }
+
+        this.currentChallenge = {
+            id: Date.now(),
+            theme_id: this.selectedChallengeTheme.id,
+            started_at: new Date().toISOString(),
+            completed_orders: 0,
+            target_orders: this.selectedChallengeTheme.target_orders,
+            used_categories: this.selectedChallengeTheme.category === 'mixed' ? [] : null,
+            status: 'active'
+        };
+
+        this.saveToLocalStorage();
+        this.renderChallengeThemes();
+        this.renderCurrentChallenge();
+        
+        document.getElementById('challenge-detail-modal').classList.remove('active');
+        
+        alert(`挑战开始！\n\n挑战主题: ${this.selectedChallengeTheme.name}\n目标: ${this.selectedChallengeTheme.target_orders} 单\n\n加油！`);
+    }
+
+    checkChallengeOrder(drinkCategory) {
+        if (!this.currentChallenge) return true;
+
+        const themes = window.API.getChallengeThemes();
+        const theme = themes.find(t => t.id === this.currentChallenge.theme_id);
+        
+        if (!theme) return true;
+
+        if (theme.category === 'mixed') {
+            if (!this.currentChallenge.used_categories) {
+                this.currentChallenge.used_categories = [];
+            }
+            if (!this.currentChallenge.used_categories.includes(drinkCategory)) {
+                this.currentChallenge.used_categories.push(drinkCategory);
+            }
+            this.currentChallenge.completed_orders++;
+        } else {
+            if (drinkCategory !== theme.category) {
+                alert(`挑战进行中！当前挑战主题是 "${theme.name}"，只能点单 ${theme.category} 的饮品。`);
+                return false;
+            }
+            this.currentChallenge.completed_orders++;
+        }
+
+        if (this.currentChallenge.completed_orders >= theme.target_orders) {
+            this.completeChallenge();
+        }
+
+        this.saveToLocalStorage();
+        this.renderCurrentChallenge();
+        
+        return true;
+    }
+
+    completeChallenge() {
+        if (!this.currentChallenge) return;
+
+        const themes = window.API.getChallengeThemes();
+        const theme = themes.find(t => t.id === this.currentChallenge.theme_id);
+        
+        if (!theme) return;
+
+        this.currentChallenge.status = 'completed';
+        this.currentChallenge.completed_at = new Date().toISOString();
+        
+        this.challengeHistory.push({ ...this.currentChallenge });
+
+        const achievementId = `challenge_${theme.id}`;
+        if (!this.earnedAchievements.includes(achievementId)) {
+            this.earnedAchievements.push(achievementId);
+        }
+
+        this.currentChallenge = null;
+        this.saveToLocalStorage();
+
+        setTimeout(() => {
+            document.getElementById('unlock-message').textContent = 
+                `恭喜完成挑战！\n\n获得成就: ${theme.rewards.achievement}\n获得称号: ${theme.rewards.title}`;
+            document.getElementById('unlock-modal').classList.add('active');
+        }, 500);
+    }
+
+    formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('zh-CN', {
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    renderTaskStats() {
+        const totalCollaborations = this.taskChainHistory.filter(t => t.status === 'completed').length;
+        document.getElementById('total-collaborations').textContent = totalCollaborations;
+
+        if (this.fastestRelayTime !== null) {
+            const minutes = Math.floor(this.fastestRelayTime / 60);
+            const seconds = this.fastestRelayTime % 60;
+            document.getElementById('fastest-relay').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        const totalTaskChains = this.taskChainHistory.length;
+        const completedTaskChains = this.taskChainHistory.filter(t => t.status === 'completed').length;
+        const rate = totalTaskChains > 0 ? Math.round((completedTaskChains / totalTaskChains) * 100) : 0;
+        document.getElementById('collaboration-rate').textContent = `${rate}%`;
+    }
+
+    renderActiveTaskChains() {
+        const container = document.getElementById('active-tasks-list');
+        const section = document.getElementById('active-tasks-section');
+
+        if (this.activeTaskChains.length === 0) {
+            section.style.display = 'none';
+            return;
+        }
+
+        section.style.display = 'block';
+        const taskTypes = window.API.getTaskTypes();
+
+        container.innerHTML = this.activeTaskChains.map(chain => {
+            const currentTaskIndex = chain.tasks.findIndex(t => t.status === 'pending');
+            const currentTask = chain.tasks[currentTaskIndex];
+            const currentTaskType = taskTypes.find(t => t.id === currentTask?.type);
+
+            return `
+                <div class="task-chain-card active" data-chain-id="${chain.id}">
+                    <div class="task-chain-header">
+                        <span class="task-chain-drink">${chain.drink_name}</span>
+                        <span class="task-chain-status">进行中</span>
+                    </div>
+                    <div class="task-chain-progress">
+                        <span class="task-chain-progress-text">
+                            ${chain.tasks.filter(t => t.status === 'completed').length}/${chain.tasks.length} 任务已完成
+                        </span>
+                    </div>
+                    <div class="task-chain-tasks">
+                        ${chain.tasks.map((task, index) => {
+                            const taskType = taskTypes.find(t => t.id === task.type);
+                            const isCurrent = task.status === 'pending' && index === currentTaskIndex;
+                            const isCompleted = task.status === 'completed';
+                            
+                            return `
+                                <div class="task-item ${isCurrent ? 'current' : ''} ${isCompleted ? 'completed' : ''}">
+                                    <span class="task-item-icon">${taskType?.icon || '📋'}</span>
+                                    <span class="task-item-name">${taskType?.name || '未知任务'}</span>
+                                    ${task.assigned_to ? `<span class="task-item-assignee">→ ${task.assigned_to}</span>` : ''}
+                                    ${isCompleted ? '<span class="task-item-check">✓</span>' : ''}
+                                    ${isCurrent ? `
+                                        <button class="task-complete-btn" data-chain-id="${chain.id}" data-task-index="${index}">
+                                            完成任务
+                                        </button>
+                                    ` : ''}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        container.querySelectorAll('.task-complete-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const chainId = parseInt(btn.dataset.chainId);
+                const taskIndex = parseInt(btn.dataset.taskIndex);
+                this.completeTask(chainId, taskIndex);
+            });
+        });
+    }
+
+    renderTaskChainHistory() {
+        const container = document.getElementById('task-history-list');
+        
+        if (this.taskChainHistory.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">🔗</div>
+                    <p>还没有协作任务链记录</p>
+                    <p class="empty-hint">创建协作订单，体验全家接力的乐趣！</p>
+                </div>
+            `;
+            return;
+        }
+
+        const taskTypes = window.API.getTaskTypes();
+
+        container.innerHTML = this.taskChainHistory.slice(0, 10).map(chain => {
+            const statusClass = chain.status === 'completed' ? 'status-completed' : 'status-cancelled';
+            const statusText = chain.status === 'completed' ? '✓ 完成' : '✗ 取消';
+            
+            let durationText = '';
+            if (chain.status === 'completed' && chain.started_at && chain.completed_at) {
+                const start = new Date(chain.started_at);
+                const end = new Date(chain.completed_at);
+                const duration = Math.round((end - start) / 1000);
+                const minutes = Math.floor(duration / 60);
+                const seconds = duration % 60;
+                durationText = `耗时: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+            }
+
+            return `
+                <div class="task-chain-history-card">
+                    <div class="task-chain-history-header">
+                        <span class="task-chain-history-drink">${chain.drink_name}</span>
+                        <span class="task-chain-history-status ${statusClass}">${statusText}</span>
+                    </div>
+                    <div class="task-chain-history-details">
+                        <span>${chain.tasks.length} 个任务</span>
+                        <span>开始: ${this.formatDate(chain.started_at)}</span>
+                        ${durationText ? `<span>${durationText}</span>` : ''}
+                    </div>
+                    <div class="task-chain-history-members">
+                        <span>参与成员: </span>
+                        ${chain.tasks.filter(t => t.assigned_to).map(t => 
+                            `<span class="member-badge">${t.assigned_to}</span>`
+                        ).join('')}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    createCollaborationOrder() {
+        if (!this.selectedCollaborationDrink) {
+            alert('请选择一杯饮品！');
+            return;
+        }
+
+        if (this.familyMembers.length < 2) {
+            alert('协作任务需要至少2个家庭成员！');
+            return;
+        }
+
+        const taskTypes = window.API.getTaskTypes();
+        const activeMembers = this.familyMembers.filter(m => m.is_active);
+        
+        let assignedMembers = [];
+        if (this.assignmentType === 'auto') {
+            const shuffled = [...activeMembers].sort(() => Math.random() - 0.5);
+            assignedMembers = shuffled.slice(0, taskTypes.length);
+        } else {
+            if (this.selectedCollaborationMembers.length < 2) {
+                alert('请至少选择2个家庭成员！');
+                return;
+            }
+            assignedMembers = this.selectedCollaborationMembers.slice(0, taskTypes.length);
+        }
+
+        const tasks = taskTypes.map((type, index) => ({
+            id: Date.now() + index,
+            type: type.id,
+            status: index === 0 ? 'pending' : 'waiting',
+            assigned_to: assignedMembers[index]?.name || null,
+            started_at: null,
+            completed_at: null
+        }));
+
+        const newChain = {
+            id: Date.now(),
+            drink_id: this.selectedCollaborationDrink.id,
+            drink_name: this.selectedCollaborationDrink.name,
+            drink_category: this.selectedCollaborationDrink.category,
+            tasks: tasks,
+            started_at: new Date().toISOString(),
+            completed_at: null,
+            status: 'active',
+            total_duration: null
+        };
+
+        this.activeTaskChains.push(newChain);
+        this.saveToLocalStorage();
+
+        this.renderTaskStats();
+        this.renderActiveTaskChains();
+        
+        document.getElementById('create-collaboration-modal').classList.remove('active');
+        
+        alert(`协作任务链已创建！\n\n饮品: ${this.selectedCollaborationDrink.name}\n任务数: ${tasks.length}\n\n开始你的接力之旅吧！`);
+    }
+
+    completeTask(chainId, taskIndex) {
+        const chainIndex = this.activeTaskChains.findIndex(c => c.id === chainId);
+        if (chainIndex === -1) return;
+
+        const chain = this.activeTaskChains[chainIndex];
+        const task = chain.tasks[taskIndex];
+        
+        if (task.status !== 'pending') return;
+
+        task.status = 'completed';
+        task.completed_at = new Date().toISOString();
+
+        if (taskIndex + 1 < chain.tasks.length) {
+            chain.tasks[taskIndex + 1].status = 'pending';
+            chain.tasks[taskIndex + 1].started_at = new Date().toISOString();
+        } else {
+            chain.status = 'completed';
+            chain.completed_at = new Date().toISOString();
+            
+            const start = new Date(chain.started_at);
+            const end = new Date(chain.completed_at);
+            const duration = Math.round((end - start) / 1000);
+            chain.total_duration = duration;
+
+            if (this.fastestRelayTime === null || duration < this.fastestRelayTime) {
+                this.fastestRelayTime = duration;
+            }
+
+            this.taskChainHistory.push({ ...chain });
+            this.activeTaskChains.splice(chainIndex, 1);
+
+            const collabFirstAchievement = 'collaboration_first';
+            if (!this.earnedAchievements.includes(collabFirstAchievement)) {
+                const totalCompleted = this.taskChainHistory.filter(t => t.status === 'completed').length;
+                if (totalCompleted >= 1) {
+                    this.earnedAchievements.push(collabFirstAchievement);
+                }
+            }
+
+            if (duration <= 300) {
+                const fastAchievement = 'collaboration_fast';
+                if (!this.earnedAchievements.includes(fastAchievement)) {
+                    this.earnedAchievements.push(fastAchievement);
+                }
+            }
+
+            setTimeout(() => {
+                const minutes = Math.floor(duration / 60);
+                const seconds = duration % 60;
+                document.getElementById('unlock-message').textContent = 
+                    `协作任务链完成！\n\n耗时: ${minutes}分${seconds}秒\n\n太棒了，全家协作真愉快！`;
+                document.getElementById('unlock-modal').classList.add('active');
+            }, 500);
+        }
+
+        chain.tasks.forEach(t => {
+            if (t.assigned_to) {
+                if (!this.personalContributions[t.assigned_to]) {
+                    this.personalContributions[t.assigned_to] = {
+                        tasks_completed: 0,
+                        task_types: {}
+                    };
+                }
+                if (t.status === 'completed') {
+                    this.personalContributions[t.assigned_to].tasks_completed++;
+                    if (!this.personalContributions[t.assigned_to].task_types[t.type]) {
+                        this.personalContributions[t.assigned_to].task_types[t.type] = 0;
+                    }
+                    this.personalContributions[t.assigned_to].task_types[t.type]++;
+                }
+            }
+        });
+
+        this.saveToLocalStorage();
+        this.renderTaskStats();
+        this.renderActiveTaskChains();
+        this.renderTaskChainHistory();
+    }
+
+    renderAchievements() {
+        const allAchievements = window.API.getAchievements();
+        const container = document.getElementById('family-achievements-grid');
+
+        const rarityColors = {
+            '普通': 'var(--text-secondary)',
+            '稀有': 'var(--secondary-color)',
+            '史诗': 'var(--accent-purple)',
+            '传说': 'var(--accent-orange)'
+        };
+
+        const rarityBorders = {
+            '普通': '2px solid var(--border-color)',
+            '稀有': '2px solid var(--secondary-color)',
+            '史诗': '2px solid var(--accent-purple)',
+            '传说': '2px solid var(--accent-orange)'
+        };
+
+        container.innerHTML = allAchievements.map(achievement => {
+            const isEarned = this.earnedAchievements.includes(achievement.id);
+            
+            return `
+                <div class="achievement-card ${isEarned ? 'earned' : 'locked'}" 
+                     data-achievement-id="${achievement.id}"
+                     style="border: ${rarityBorders[achievement.rarity]}">
+                    <div class="achievement-icon-wrapper">
+                        <span class="achievement-icon">${achievement.icon}</span>
+                        ${!isEarned ? '<span class="achievement-lock">🔒</span>' : ''}
+                    </div>
+                    <div class="achievement-info">
+                        <span class="achievement-name">${achievement.name}</span>
+                        <span class="achievement-desc">${achievement.description}</span>
+                    </div>
+                    <div class="achievement-rarity" style="color: ${rarityColors[achievement.rarity]}">
+                        ${achievement.rarity}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        container.querySelectorAll('.achievement-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const achievementId = card.dataset.achievementId;
+                this.openAchievementDetail(achievementId);
+            });
+        });
+    }
+
+    renderContributionRanking() {
+        const container = document.getElementById('contribution-ranking');
+        
+        const contributions = [];
+        
+        this.familyMembers.forEach(member => {
+            const personalData = this.personalContributions[member.name] || { tasks_completed: 0 };
+            contributions.push({
+                name: member.name,
+                icon: member.icon,
+                assignment_count: member.assignment_count,
+                tasks_completed: personalData.tasks_completed,
+                total: member.assignment_count + personalData.tasks_completed
+            });
+        });
+
+        contributions.sort((a, b) => b.total - a.total);
+
+        if (contributions.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">👥</div>
+                    <p>还没有贡献数据</p>
+                    <p class="empty-hint">添加家庭成员并开始点单吧！</p>
+                </div>
+            `;
+            return;
+        }
+
+        const medals = ['🥇', '🥈', '🥉'];
+
+        container.innerHTML = contributions.map((member, index) => `
+            <div class="contribution-rank-item ${index < 3 ? 'top-three' : ''}">
+                <span class="rank-number">${medals[index] || (index + 1)}</span>
+                <span class="rank-icon">${member.icon}</span>
+                <span class="rank-name">${member.name}</span>
+                <div class="rank-stats">
+                    <span class="rank-stat">指派: ${member.assignment_count}</span>
+                    <span class="rank-stat">任务: ${member.tasks_completed}</span>
+                </div>
+                <span class="rank-total">${member.total} 分</span>
+            </div>
+        `).join('');
+    }
+
+    updateAchievementStats() {
+        document.getElementById('family-total-orders').textContent = this.progress.total_orders;
+        document.getElementById('family-unlocked-categories').textContent = this.progress.unlocked_categories.length;
+        document.getElementById('family-achievements').textContent = this.earnedAchievements.length;
+        document.getElementById('family-streak').textContent = this.streakDays;
+    }
+
+    openAchievementDetail(achievementId) {
+        const allAchievements = window.API.getAchievements();
+        const achievement = allAchievements.find(a => a.id === achievementId);
+        
+        if (!achievement) return;
+
+        const isEarned = this.earnedAchievements.includes(achievementId);
+
+        const rarityColors = {
+            '普通': 'var(--text-secondary)',
+            '稀有': 'var(--secondary-color)',
+            '史诗': 'var(--accent-purple)',
+            '传说': 'var(--accent-orange)'
+        };
+
+        document.getElementById('achievement-detail-title').textContent = achievement.name;
+        document.getElementById('achievement-detail-body').innerHTML = `
+            <div class="achievement-detail-info">
+                <div class="achievement-detail-icon ${isEarned ? '' : 'locked'}">
+                    ${achievement.icon}
+                </div>
+                <p class="achievement-detail-desc">${achievement.description}</p>
+                
+                <div class="achievement-detail-stats">
+                    <div class="achievement-detail-stat">
+                        <span class="achievement-detail-stat-label">稀有度</span>
+                        <span class="achievement-detail-stat-value" style="color: ${rarityColors[achievement.rarity]}">
+                            ${achievement.rarity}
+                        </span>
+                    </div>
+                    <div class="achievement-detail-stat">
+                        <span class="achievement-detail-stat-label">分类</span>
+                        <span class="achievement-detail-stat-value">${this.getAchievementCategoryName(achievement.category)}</span>
+                    </div>
+                    <div class="achievement-detail-stat">
+                        <span class="achievement-detail-stat-label">状态</span>
+                        <span class="achievement-detail-stat-value ${isEarned ? 'earned' : 'locked'}">
+                            ${isEarned ? '✓ 已获得' : '🔒 未获得'}
+                        </span>
+                    </div>
+                </div>
+                
+                ${!isEarned ? `
+                    <div class="achievement-hint">
+                        <p>💡 提示: ${this.getAchievementHint(achievement)}</p>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+
+        document.getElementById('achievement-detail-modal').classList.add('active');
+    }
+
+    getAchievementCategoryName(category) {
+        const categoryNames = {
+            'order': '订单成就',
+            'unlock': '解锁成就',
+            'challenge': '挑战成就',
+            'collaboration': '协作成就',
+            'streak': '连续成就'
+        };
+        return categoryNames[category] || '其他';
+    }
+
+    getAchievementHint(achievement) {
+        const hints = {
+            'first_order': '完成第一笔订单即可获得',
+            'order_10': '完成10笔订单即可获得',
+            'order_50': '完成50笔订单即可获得',
+            'order_100': '完成100笔订单即可获得',
+            'unlock_milk_tea': '解锁奶茶系列即可获得',
+            'unlock_fruit_tea': '解锁果茶系列即可获得',
+            'unlock_coffee': '解锁咖啡系列即可获得',
+            'unlock_all': '解锁所有饮品系列即可获得',
+            'challenge_milk_tea': '完成奶茶狂欢日挑战即可获得',
+            'challenge_fruit_tea': '完成果茶清新日挑战即可获得',
+            'challenge_coffee': '完成咖啡时光日挑战即可获得',
+            'challenge_mixed': '完成混合挑战日挑战即可获得',
+            'collaboration_first': '完成第一次协作任务链即可获得',
+            'collaboration_10': '完成10次协作任务链即可获得',
+            'collaboration_fast': '在5分钟内完成一次协作任务链即可获得',
+            'streak_7': '连续7天有点单记录即可获得',
+            'streak_30': '连续30天有点单记录即可获得'
+        };
+        return hints[achievement.id] || '继续努力吧！';
+    }
+
+    generateAchievementReceipt() {
+        const receiptContainer = document.getElementById('achievement-receipt-container');
+        
+        const totalOrders = this.progress.total_orders;
+        const unlockedCategories = this.progress.unlocked_categories.length;
+        const earnedAchievements = this.earnedAchievements.length;
+        const totalAchievements = window.API.getAchievements().length;
+        const streakDays = this.streakDays;
+        const totalCollaborations = this.taskChainHistory.filter(t => t.status === 'completed').length;
+
+        const recentAchievements = window.API.getAchievements()
+            .filter(a => this.earnedAchievements.includes(a.id))
+            .slice(0, 5);
+
+        receiptContainer.innerHTML = `
+            <div class="receipt-header">
+                <div class="receipt-logo">🏆</div>
+                <div class="receipt-title">Bapoo MixPlay</div>
+                <div class="receipt-subtitle">家庭成就报告</div>
+            </div>
+            
+            <div class="receipt-order-info">
+                <div class="receipt-row">
+                    <span class="receipt-label">生成时间</span>
+                    <span>${new Date().toLocaleString('zh-CN')}</span>
+                </div>
+            </div>
+
+            <div class="receipt-items">
+                <div class="receipt-item-name">📊 家庭统计</div>
+                <div class="receipt-item-specs">累计点单: ${totalOrders} 单</div>
+                <div class="receipt-item-specs">解锁品类: ${unlockedCategories} 个</div>
+                <div class="receipt-item-specs">获得成就: ${earnedAchievements}/${totalAchievements}</div>
+                <div class="receipt-item-specs">连续天数: ${streakDays} 天</div>
+                <div class="receipt-item-specs">协作完成: ${totalCollaborations} 次</div>
+            </div>
+
+            ${recentAchievements.length > 0 ? `
+                <div class="receipt-items">
+                    <div class="receipt-item-name">🎖️ 近期成就</div>
+                    ${recentAchievements.map(a => `
+                        <div class="receipt-item-specs">${a.icon} ${a.name}</div>
+                    `).join('')}
+                </div>
+            ` : ''}
+
+            <div class="receipt-total">
+                <span>成就进度</span>
+                <span>${Math.round((earnedAchievements / totalAchievements) * 100)}%</span>
+            </div>
+
+            <div class="receipt-assignment">
+                <div class="assignment-title">✨ 继续加油</div>
+                <div class="assignment-message">
+                    ${earnedAchievements >= totalAchievements 
+                        ? '太棒了！你已经收集了所有成就！' 
+                        : `还有 ${totalAchievements - earnedAchievements} 个成就等待解锁！`
+                    }
+                </div>
+            </div>
+
+            <div class="receipt-footer">
+                <div class="receipt-thanks">感谢使用 Bapoo MixPlay！</div>
+                <div class="receipt-time">让每一杯饮品都充满爱与欢笑 💕</div>
+            </div>
+        `;
+
+        document.getElementById('achievement-receipt-modal').classList.add('active');
+    }
+
+    checkAchievements() {
+        const allAchievements = window.API.getAchievements();
+
+        allAchievements.forEach(achievement => {
+            if (this.earnedAchievements.includes(achievement.id)) return;
+
+            let earned = false;
+
+            switch (achievement.category) {
+                case 'order':
+                    if (typeof achievement.target === 'number') {
+                        earned = this.progress.total_orders >= achievement.target;
+                    }
+                    break;
+
+                case 'unlock':
+                    if (achievement.target === 'all') {
+                        const allCategories = ['基础饮品', '奶茶系列', '果茶系列', '咖啡系列', '特调系列'];
+                        earned = allCategories.every(cat => this.progress.unlocked_categories.includes(cat));
+                    } else {
+                        earned = this.progress.unlocked_categories.includes(achievement.target);
+                    }
+                    break;
+
+                case 'collaboration':
+                    if (achievement.id === 'collaboration_first') {
+                        const completed = this.taskChainHistory.filter(t => t.status === 'completed').length;
+                        earned = completed >= 1;
+                    } else if (achievement.id === 'collaboration_10') {
+                        const completed = this.taskChainHistory.filter(t => t.status === 'completed').length;
+                        earned = completed >= 10;
+                    }
+                    break;
+
+                case 'streak':
+                    if (typeof achievement.target === 'number') {
+                        earned = this.streakDays >= achievement.target;
+                    }
+                    break;
+            }
+
+            if (earned) {
+                this.earnedAchievements.push(achievement.id);
+                
+                setTimeout(() => {
+                    document.getElementById('unlock-message').textContent = 
+                        `🎉 恭喜获得成就！\n\n${achievement.icon} ${achievement.name}\n${achievement.description}`;
+                    document.getElementById('unlock-modal').classList.add('active');
+                }, 300);
+            }
+        });
+
+        this.saveToLocalStorage();
+    }
+
+    updateStreak() {
+        const today = new Date().toDateString();
+        
+        if (!this.lastOrderDate) {
+            this.streakDays = 1;
+        } else {
+            const lastDate = new Date(this.lastOrderDate);
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            
+            if (lastDate.toDateString() === yesterday.toDateString()) {
+                this.streakDays++;
+            } else if (lastDate.toDateString() !== today) {
+                this.streakDays = 1;
+            }
+        }
+        
+        this.lastOrderDate = today;
+        this.saveToLocalStorage();
+    }
+
+    async placeOrder() {
+        if (!this.selectedDrink) return;
+        if (this.familyMembers.length === 0) {
+            alert('请先添加家庭成员！');
+            return;
+        }
+
+        if (this.currentChallenge) {
+            if (!this.checkChallengeOrder(this.selectedDrink.category)) {
+                return;
+            }
+        }
+
+        let total = this.selectedDrink.base_price;
+        if (this.customizations.cup_size === '大杯') total += 2;
+        else if (this.customizations.cup_size === '超大杯') total += 4;
+        this.customizations.toppings.forEach(t => total += t.price);
+
+        const activeMembers = this.familyMembers.filter(m => m.is_active);
+        const randomIndex = Math.floor(Math.random() * activeMembers.length);
+        const assignedMember = activeMembers[randomIndex];
+
+        const memberIndex = this.familyMembers.findIndex(m => m.id === assignedMember.id);
+        if (memberIndex > -1) {
+            this.familyMembers[memberIndex].assignment_count++;
+        }
+
+        const orderData = {
+            drink_id: this.selectedDrink.id,
+            drink_name: this.selectedDrink.name,
+            sweetness: this.customizations.sweetness,
+            ice_level: this.customizations.ice_level,
+            cup_size: this.customizations.cup_size,
+            toppings: this.customizations.toppings,
+            total_price: total,
+            assigned_to: assignedMember.name
+        };
+
+        const order = window.API.generateMockOrder(orderData);
+        this.orderHistory.unshift(order);
+
+        this.progress.total_orders++;
+        this.updateStreak();
+        this.checkUnlocks();
+        this.checkAchievements();
+
+        this.saveToLocalStorage();
+
+        document.getElementById('drink-modal').classList.remove('active');
+        this.showReceipt(order, assignedMember);
     }
 }
 
