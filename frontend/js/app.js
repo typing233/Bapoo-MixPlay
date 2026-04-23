@@ -323,11 +323,35 @@ class MixPlayApp {
             drinks = drinks.filter(d => d.category === this.currentCategory);
         }
 
-        drinks = drinks.map(drink => {
-            if (this.progress.unlocked_categories.includes(drink.category)) {
-                return { ...drink, is_unlocked: true };
+        let challengeTheme = null;
+        let challengeCategory = null;
+        if (this.currentChallenge) {
+            const themes = window.API.getChallengeThemes();
+            challengeTheme = themes.find(t => t.id === this.currentChallenge.theme_id);
+            if (challengeTheme) {
+                challengeCategory = challengeTheme.category;
             }
-            return drink;
+        }
+
+        drinks = drinks.map(drink => {
+            let isUnlocked = this.progress.unlocked_categories.includes(drink.category);
+            let isTemporaryUnlock = false;
+
+            if (challengeTheme && !isUnlocked) {
+                if (challengeCategory === 'mixed') {
+                    isUnlocked = true;
+                    isTemporaryUnlock = true;
+                } else if (drink.category === challengeCategory) {
+                    isUnlocked = true;
+                    isTemporaryUnlock = true;
+                }
+            }
+
+            return { 
+                ...drink, 
+                is_unlocked: isUnlocked,
+                is_temporary_unlock: isTemporaryUnlock
+            };
         });
 
         const drinkIcons = {
@@ -346,20 +370,22 @@ class MixPlayApp {
         container.innerHTML = drinks.map(drink => {
             const icon = drink.icon || drinkIcons[drink.name] || '🥤';
             const isLocked = !drink.is_unlocked;
+            const isTemporary = drink.is_temporary_unlock;
 
             return `
-                <div class="drink-card ${isLocked ? 'locked' : ''}" data-id="${drink.id}">
+                <div class="drink-card ${isLocked ? 'locked' : ''} ${isTemporary ? 'temporary-unlock' : ''}" data-id="${drink.id}">
                     <div class="drink-icon-wrapper">
                         <span class="drink-icon">${icon}</span>
                         ${isLocked ? `<span class="locked-badge">🔒 ${drink.unlock_condition || '未解锁'}</span>` : ''}
+                        ${isTemporary ? `<span class="temporary-badge">🎯 挑战解锁</span>` : ''}
                     </div>
                     <div class="drink-info">
                         <h3 class="drink-name">${drink.name}</h3>
                         <p class="drink-desc">${drink.description}</p>
                         <div class="drink-footer">
                             <span class="drink-price">${drink.base_price.toFixed(1)}</span>
-                            <button class="order-btn-small" ${isLocked ? 'disabled' : ''}>
-                                ${isLocked ? '🔒 未解锁' : '点单'}
+                            <button class="order-btn-small ${isTemporary ? 'temporary' : ''}" ${isLocked ? 'disabled' : ''}>
+                                ${isLocked ? '🔒 未解锁' : (isTemporary ? '🎯 挑战点单' : '点单')}
                             </button>
                         </div>
                     </div>
